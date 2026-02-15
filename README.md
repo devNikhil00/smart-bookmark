@@ -20,6 +20,69 @@ Production-grade bookmark management application with real-time synchronization 
 - Tailwind CSS
 - Vercel (Deployment)
 
+## 🚨 Problems Faced & Solutions
+
+### Problem 1: Real-time Memory Leaks 💥
+**Issue**: WebSocket subscriptions caused memory leaks when navigating between pages.
+
+**Solution**: 
+```typescript
+// ❌ WRONG - Creates new client on every render
+const supabase = createClient()
+
+// ✅ CORRECT - Memoized client + proper cleanup
+const supabase = useMemo(() => createClient(), [])
+
+useEffect(() => {
+  const channel = supabase.channel('bookmarks').subscribe()
+  return () => {
+    supabase.removeChannel(channel) // Critical cleanup!
+  }
+}, [supabase])
+```
+
+### Problem 2: Row Level Security Bypass ⚠️
+**Issue**: Users could potentially access other users' bookmarks via direct API calls.
+
+**Solution**: Implemented PostgreSQL Row Level Security (RLS):
+```sql
+ALTER TABLE bookmarks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users view own bookmarks" 
+  ON bookmarks FOR SELECT 
+  USING (auth.uid() = user_id);
+```
+
+### Problem 3: OAuth Redirect Loop 🔄
+**Issue**: Middleware intercepted OAuth callback routes causing infinite redirects.
+
+**Solution**: Excluded OAuth routes from middleware:
+```typescript
+export const config = {
+  matcher: [
+    '/((?!auth/callback|auth/signout|_next/static|_next/image|favicon.ico).*)'
+  ]
+}
+```
+
+### Problem 4: TypeScript Type Safety 🔥
+**Issue**: Supabase returned `any` types everywhere, no autocomplete or type checking.
+
+**Solution**: Created comprehensive Database types:
+```typescript
+export interface Database {
+  public: {
+    Tables: {
+      bookmarks: {
+        Row: Bookmark
+        Insert: BookmarkInsert
+        Update: BookmarkUpdate
+      }
+    }
+  }
+}
+```
+
 ## Getting Started
 
 1. Clone the repository
@@ -48,6 +111,13 @@ Deploy to Vercel:
 1. Connect your GitHub repository to Vercel
 2. Add environment variables in Vercel dashboard
 3. Deploy
+
+## Security Features
+
+- **4-Layer Security**: Edge Middleware → Server Components → Server Actions → Row Level Security
+- **HTTP-only Cookies**: Secure session management
+- **Input Validation**: Client + server-side validation
+- **CSRF Protection**: Built-in Next.js protection
 
 ## License
 
