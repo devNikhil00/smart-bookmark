@@ -1,15 +1,5 @@
 /**
  * Database Types
- * 
- * Why this exists:
- * - Type safety across the entire application
- * - Autocomplete in IDE
- * - Catch errors at compile time, not runtime
- * - Self-documenting code
- * 
- * Best practice:
- * - Generate these types from Supabase CLI: `supabase gen types typescript`
- * - For now, manually defined based on schema
  */
 
 export interface Bookmark {

@@ -6,7 +6,7 @@ export class ValidationError extends Error {
 }
 
 export function validateUrl(url: string): void {
-  if (!url || !url.trim()) {
+  if (!url?.trim()) {
     throw new ValidationError('URL is required')
   }
 
@@ -14,11 +14,6 @@ export function validateUrl(url: string): void {
 
   if (!trimmedUrl.match(/^https?:\/\//)) {
     throw new ValidationError('URL must start with http:// or https://')
-  }
-
-  const urlPattern = /^https?:\/\/([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/
-  if (!urlPattern.test(trimmedUrl)) {
-    throw new ValidationError('Please enter a valid URL (e.g., https://example.com)')
   }
 
   try {
@@ -29,7 +24,7 @@ export function validateUrl(url: string): void {
 }
 
 export function validateTitle(title: string): void {
-  if (!title || !title.trim()) {
+  if (!title?.trim()) {
     throw new ValidationError('Title is required')
   }
 

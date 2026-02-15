@@ -1,10 +1,5 @@
 /**
  * EmptyState Component
- * 
- * Why separate component:
- * - Reusable empty state pattern
- * - Clean UI/UX
- * - Easy to customize
  */
 
 export function EmptyState() {
